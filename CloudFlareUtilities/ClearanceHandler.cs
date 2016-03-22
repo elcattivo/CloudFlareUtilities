@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace CloudFlareUtilities
 {
+    /// <summary>
+    /// A HTTP handler that transparently manages Cloudflare's Anti-DDoS measure.
+    /// </summary>
+    /// <remarks>
+    /// Only the JavaScript challenge can be handled. CAPTCHA and IP address blocking cannot be bypassed.
+    /// </remarks>
     public class ClearanceHandler : DelegatingHandler
     {
         private const string CloudFlareServerName = "cloudflare-nginx";
@@ -18,8 +24,15 @@ namespace CloudFlareUtilities
         private readonly HttpClient _client;
         private readonly HttpClientHandler _innerHandler;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a default <see cref="HttpClientHandler"/> as inner handler.
+        /// </summary>
         public ClearanceHandler() : this(new HttpClientHandler()) { }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a specific <see cref="HttpClientHandler"/> as inner handler.
+        /// </summary>
+        /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
         public ClearanceHandler(HttpClientHandler innerHandler) : base(innerHandler)
         {
             _innerHandler = innerHandler;
@@ -30,6 +43,24 @@ namespace CloudFlareUtilities
             });
         }
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ClearanceHandler"/>, and optionally disposes of the managed resources.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to releases only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _client.Dispose();
+
+            base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation.
+        /// </summary>
+        /// <param name="request">The HTTP request message to send to the server.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel operation.   </param>
+        /// <returns>The task object representing the asynchronous operation.</returns>
         protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             EnsureClientHeader(request);
@@ -52,6 +83,15 @@ namespace CloudFlareUtilities
         {
             if (!request.Headers.UserAgent.Any())
                 request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Client", "1.0"));
+        }
+
+        private static bool IsClearanceRequired(HttpResponseMessage response)
+        {
+            var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
+            var isCloudFlareServer = response.Headers.Server.Any(i => i.Product.Name == CloudFlareServerName);
+            var hasRedirectToClearancePage = response.Headers.Contains(HttpHeader.Refresh);
+
+            return isServiceUnavailable && isCloudFlareServer && hasRedirectToClearancePage;
         }
 
         private void InjectCookies(HttpRequestMessage request)
@@ -77,16 +117,7 @@ namespace CloudFlareUtilities
                 request.Headers.Add(HttpHeader.Cookie, clearanceCookie.ToHeaderValue());
             }
         }
-
-        private static bool IsClearanceRequired(HttpResponseMessage response)
-        {
-            var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
-            var isCloudFlareServer = response.Headers.Server.Any(i => i.Product.Name == CloudFlareServerName);
-            var hasRedirectToClearancePage = response.Headers.Contains(HttpHeader.Refresh);
-
-            return isServiceUnavailable && isCloudFlareServer && hasRedirectToClearancePage;
-        }
-
+        
         private async Task PassClearance(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             SaveIdCookie(response);
@@ -117,14 +148,6 @@ namespace CloudFlareUtilities
 
             foreach (var cookie in cookies)
                 _cookies.SetCookies(response.RequestMessage.RequestUri, cookie);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                _client.Dispose();
-
-            base.Dispose(disposing);
-        }
+        }        
     }
 }
