@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://raw.githubusercontent.com/elcattivo/CloudFlareUtilities/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/elcattivo/CloudFlareUtilities</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>For release notes see: https://github.com/elcattivo/CloudFlareUtilities/releases</releaseNotes>
+    <copyright>Copyright 2016 El Cattivo</copyright>
+    <tags>CloudFlare HttpClient DelegatingHandler Web JavaScript DDoS Protection Challenge Bypass</tags>
+  </metadata>
+</package>

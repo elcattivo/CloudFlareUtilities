@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CloudFlare Utilities")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A .NET PCL to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a DelegatingHandler.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("El Cattivo")]
 [assembly: AssemblyProduct("CloudFlare Utilities")]
 [assembly: AssemblyCopyright("Copyright © El Cattivo 2016")]
 [assembly: AssemblyTrademark("")]
