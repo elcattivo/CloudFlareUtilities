@@ -22,26 +22,26 @@ namespace CloudFlareUtilities
 
         private readonly CookieContainer _cookies = new CookieContainer();
         private readonly HttpClient _client;
-        private readonly HttpClientHandler _innerHandler;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a default <see cref="HttpClientHandler"/> as inner handler.
+        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a <see cref="HttpClientHandler"/> as inner handler.
         /// </summary>
         public ClearanceHandler() : this(new HttpClientHandler()) { }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a specific <see cref="HttpClientHandler"/> as inner handler.
+        /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a specific inner handler.
         /// </summary>
         /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
-        public ClearanceHandler(HttpClientHandler innerHandler) : base(innerHandler)
+        public ClearanceHandler(HttpMessageHandler innerHandler) : base(innerHandler)
         {
-            _innerHandler = innerHandler;
             _client = new HttpClient(new HttpClientHandler
             {
                 AllowAutoRedirect = false,
                 CookieContainer = _cookies
             });
         }
+
+        private HttpClientHandler ClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="ClearanceHandler"/>, and optionally disposes of the managed resources.
@@ -103,13 +103,13 @@ namespace CloudFlareUtilities
             if (idCookie == null || clearanceCookie == null)
                 return;
 
-            if (_innerHandler.UseCookies)
+            if (ClientHandler.UseCookies)
             {
-                foreach (var cookie in _innerHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName, ClearanceCookieName))
+                foreach (var cookie in ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName, ClearanceCookieName))
                     cookie.Expired = true;
 
-                _innerHandler.CookieContainer.SetCookies(request.RequestUri, idCookie.ToHeaderValue());
-                _innerHandler.CookieContainer.SetCookies(request.RequestUri, clearanceCookie.ToHeaderValue());
+                ClientHandler.CookieContainer.SetCookies(request.RequestUri, idCookie.ToHeaderValue());
+                ClientHandler.CookieContainer.SetCookies(request.RequestUri, clearanceCookie.ToHeaderValue());
             }
             else
             {
