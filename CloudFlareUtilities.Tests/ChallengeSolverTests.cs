@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CloudFlareUtilities.Tests
 {
@@ -9,7 +10,7 @@ namespace CloudFlareUtilities.Tests
         private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
         private const string Pass = "1458515751.766-rbEAC9yDbP";
         private const string ClearancePage = "/cdn-cgi/l/chk_jschl";
-        private const int ValidAnswer = 0;
+        private const int ValidAnswer = 293;
 
         private const string JavaScriptData =
 @"<script type=""text/javascript"">
@@ -27,7 +28,7 @@ namespace CloudFlareUtilities.Tests
         t = t.substr(r.length); t = t.substr(0,t.length-1);
         a = document.getElementById('jschl-answer');
         f = document.getElementById('challenge-form');
-        ;BAaNzsI.BthP-=+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]));BAaNzsI.BthP-=!+[]+!![];BAaNzsI.BthP-=+((!+[]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));a.value = parseInt(BAaNzsI.BthP, 10) + t.length;
+        ;BAaNzsI.BthP-=+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]));BAaNzsI.BthP+=!+[]+!![];BAaNzsI.BthP*=+((!+[]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));BAaNzsI.BthP/=!+[]+!![];a.value = parseInt(BAaNzsI.BthP, 10) + t.length;
         f.submit();
       }, 4000);
     }, false);
@@ -80,6 +81,15 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             Assert.AreEqual(
                 $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidAnswer}",
                 solution.ClearanceQuery);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ApplyDecodingStepOnUnknownOperatorThrowsArgumentOutOfRangeException()
+        {
+            const string invalidOperator = "%";
+            var solverType = new PrivateType(typeof (ChallengeSolver));
+            solverType.InvokeStatic("ApplyDecodingStep", 323, Tuple.Create(invalidOperator, 32));
         }
     }
 }
