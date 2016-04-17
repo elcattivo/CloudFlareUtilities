@@ -61,7 +61,7 @@ namespace CloudFlareUtilities
         /// <param name="request">The HTTP request message to send to the server.</param>
         /// <param name="cancellationToken">A cancellation token to cancel operation.   </param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             EnsureClientHeader(request);
             InjectCookies(request);
@@ -105,11 +105,8 @@ namespace CloudFlareUtilities
 
             if (ClientHandler.UseCookies)
             {
-                foreach (var cookie in ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName, ClearanceCookieName))
-                    cookie.Expired = true;
-
-                ClientHandler.CookieContainer.SetCookies(request.RequestUri, idCookie.ToHeaderValue());
-                ClientHandler.CookieContainer.SetCookies(request.RequestUri, clearanceCookie.ToHeaderValue());
+                ClientHandler.CookieContainer.Add(request.RequestUri, idCookie);
+                ClientHandler.CookieContainer.Add(request.RequestUri, clearanceCookie);
             }
             else
             {
