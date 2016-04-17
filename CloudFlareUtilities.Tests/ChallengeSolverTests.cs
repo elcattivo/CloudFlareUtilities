@@ -46,21 +46,29 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsValidAnswer()
         {
-            var solution = ChallengeSolver.Solve(JavaScriptData, Host);
+            var pageContent = JavaScriptData + FormData;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
+
             Assert.AreEqual(ValidAnswer, solution.Answer);
         }
 
         [TestMethod]
         public void SolveReturnsVerificationCode()
         {
-            var solution = ChallengeSolver.Solve(FormData, Host);
+            var pageContent = JavaScriptData + FormData;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
+
             Assert.AreEqual(VerificationCode, solution.VerificationCode);
         }
 
         [TestMethod]
         public void SolveReturnsPass()
         {
-            var solution = ChallengeSolver.Solve(FormData, Host);
+            var pageContent = JavaScriptData + FormData;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(Pass, solution.Pass);
         }
@@ -68,7 +76,9 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsClearancePage()
         {
-            var solution = ChallengeSolver.Solve(FormData, Host);
+            var pageContent = JavaScriptData + FormData;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(ClearancePage, solution.ClearancePage);
         }
@@ -76,7 +86,9 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsValidClearanceQuery()
         {
-            var solution = ChallengeSolver.Solve(JavaScriptData + FormData, Host);
+            var pageContent = JavaScriptData + FormData;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(
                 $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidAnswer}",

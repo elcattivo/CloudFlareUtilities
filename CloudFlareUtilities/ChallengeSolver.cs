@@ -6,6 +6,7 @@ namespace CloudFlareUtilities
 {
     internal static class ChallengeSolver
     {
+        private const string ScriptTagPattern = @"<script\b[^>]*>(?<Content>.*?)<\/script>";
         private const string ObfuscatedNumberPattern = @"(?<Number>[\(\)\+\!\[\]]+)";
         private const string SimplifiedObfuscatedDigitPattern = @"\([1+[\]]+\)";
         private const string SeedPattern = ":" + ObfuscatedNumberPattern;
@@ -24,8 +25,11 @@ namespace CloudFlareUtilities
 
         private static int DecodeSecretNumber(string challengePageContent, string targetHost)
         {
-            var seed = DeobfuscateNumber(Regex.Match(challengePageContent, SeedPattern).Groups["Number"].Value);
-            var steps = Regex.Matches(challengePageContent, StepPattern).Cast<Match>()
+            var challengeScript = Regex.Matches(challengePageContent, ScriptTagPattern, RegexOptions.Singleline)
+                .Cast<Match>().Select(m => m.Groups["Content"].Value)
+                .First(c => c.Contains("jschl-answer"));
+            var seed = DeobfuscateNumber(Regex.Match(challengeScript, SeedPattern).Groups["Number"].Value);
+            var steps = Regex.Matches(challengeScript, StepPattern).Cast<Match>()
                 .Select(s => new Tuple<string, int>(s.Groups["Operator"].Value, DeobfuscateNumber(s.Groups["Number"].Value)));
             var secretNumber = steps.Aggregate(seed, ApplyDecodingStep) + targetHost.Length;
 
