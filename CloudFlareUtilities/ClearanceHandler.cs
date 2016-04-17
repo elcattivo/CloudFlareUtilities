@@ -125,7 +125,7 @@ namespace CloudFlareUtilities
             var solution = ChallengeSolver.Solve(pageContent, host);
             var clearanceUri = $"{scheme}://{host}{solution.ClearanceQuery}";
 
-            await Task.Delay(4500, cancellationToken);
+            await Task.Delay(5000, cancellationToken);
 
             var clearanceRequest = new HttpRequestMessage(HttpMethod.Get, clearanceUri);
 
