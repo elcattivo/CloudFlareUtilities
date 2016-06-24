@@ -72,9 +72,8 @@ namespace CloudFlareUtilities
             {
                 await PassClearance(response, cancellationToken);
                 InjectCookies(request);
-            }
-
-            response = await base.SendAsync(request, cancellationToken);
+                response = await base.SendAsync(request, cancellationToken);
+            }            
 
             return response;
         }
