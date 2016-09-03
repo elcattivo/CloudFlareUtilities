@@ -9,7 +9,7 @@ A .NET [PCL](https://msdn.microsoft.com/en-us/library/gg597391(v=vs.110).aspx) t
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)
 - Easily integrated into your project (implemented as DelegatingHandler; e.g. can be used with [HttpClient](https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118).aspx))
-- Usable on many different platforms ([PCL Profile 111](http://embed.plnkr.co/03ck2dCtnJogBKHJ9EjY/))
+- Usable on many different platforms ([PCL Profile 111](http://portablelibraryprofiles.apps.stephencleary.com/))
 
 ## Usage
 ```csharp
