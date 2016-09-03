@@ -16,6 +16,11 @@ namespace CloudFlareUtilities
     /// </remarks>
     public class ClearanceHandler : DelegatingHandler
     {
+        /// <summary>
+        /// The default number of retries, if clearance fails.
+        /// </summary>
+        public static readonly int DefaultMaxRetries = 3;
+
         private const string CloudFlareServerName = "cloudflare-nginx";
         private const string IdCookieName = "__cfduid";
         private const string ClearanceCookieName = "cf_clearance";
@@ -40,6 +45,12 @@ namespace CloudFlareUtilities
                 CookieContainer = _cookies
             });
         }
+
+        /// <summary>
+        /// Gets or sets the number of clearance retries, if clearance fails.
+        /// </summary>
+        /// <remarks>A negative value causes an infinite amount of retries.</remarks>
+        public int MaxRetries { get; set; } = DefaultMaxRetries;
 
         private HttpClientHandler ClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
@@ -68,12 +79,22 @@ namespace CloudFlareUtilities
 
             var response = await base.SendAsync(request, cancellationToken);
 
-            if (IsClearanceRequired(response))
+            // (Re)try clearance if required.
+            var retries = 0;
+            while (IsClearanceRequired(response) && (MaxRetries < 0 || retries <= MaxRetries))
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await PassClearance(response, cancellationToken);
                 InjectCookies(request);
                 response = await base.SendAsync(request, cancellationToken);
-            }            
+
+                retries++;
+            }
+
+            // Clearance failed.
+            if (IsClearanceRequired(response))
+                throw new CloudFlareClearanceException(retries);
 
             return response;
         }
@@ -113,7 +134,7 @@ namespace CloudFlareUtilities
                 request.Headers.Add(HttpHeader.Cookie, clearanceCookie.ToHeaderValue());
             }
         }
-        
+
         private async Task PassClearance(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             SaveIdCookie(response);
@@ -144,6 +165,6 @@ namespace CloudFlareUtilities
 
             foreach (var cookie in cookies)
                 _cookies.SetCookies(response.RequestMessage.RequestUri, cookie);
-        }        
+        }
     }
 }

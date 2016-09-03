@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="ChallengeSolution.cs" />
     <Compile Include="ClearanceHandler.cs" />
+    <Compile Include="CloudflareClearanceException.cs" />
     <Compile Include="CookieExtensions.cs" />
     <Compile Include="HttpHeader.cs" />
     <Compile Include="ChallengeSolver.cs" />
