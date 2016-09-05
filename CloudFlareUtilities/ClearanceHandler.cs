@@ -109,9 +109,9 @@ namespace CloudFlareUtilities
         {
             var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
             var isCloudFlareServer = response.Headers.Server.Any(i => i.Product.Name == CloudFlareServerName);
-            var hasRedirectToClearancePage = response.Headers.Contains(HttpHeader.Refresh);
+            var isSettingIdCookie = response.Headers.Any(h => h.Key == "Set-Cookie" && h.Value.Any(v => v.Contains(IdCookieName)));
 
-            return isServiceUnavailable && isCloudFlareServer && hasRedirectToClearancePage;
+            return isServiceUnavailable && isCloudFlareServer && isSettingIdCookie;
         }
 
         private void InjectCookies(HttpRequestMessage request)
