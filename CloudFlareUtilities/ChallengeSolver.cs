@@ -4,7 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace CloudFlareUtilities
 {
-    internal static class ChallengeSolver
+    /// <summary>
+    /// Provides methods to solve the JavaScript challenge, which is part of CloudFlares clearance process.
+    /// </summary>
+    public static class ChallengeSolver
     {
         private const string ScriptTagPattern = @"<script\b[^>]*>(?<Content>.*?)<\/script>";
         private const string ObfuscatedNumberPattern = @"(?<Number>[\(\)\+\!\[\]]+)";
@@ -13,6 +16,12 @@ namespace CloudFlareUtilities
         private const string OperatorPattern = @"(?<Operator>[\+\-\*\/]{1})\=";
         private const string StepPattern = OperatorPattern + ObfuscatedNumberPattern;
 
+        /// <summary>
+        /// Solves the given JavaScript challenge.
+        /// </summary>
+        /// <param name="challengePageContent">The HTML content of the clearance page, which contains the challenge.</param>
+        /// <param name="targetHost">The hostname of the protected website.</param>
+        /// <returns>The solution.</returns>
         public static ChallengeSolution Solve(string challengePageContent, string targetHost)
         {
             var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost);
