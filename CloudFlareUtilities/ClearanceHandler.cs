@@ -70,7 +70,7 @@ namespace CloudFlareUtilities
         /// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation.
         /// </summary>
         /// <param name="request">The HTTP request message to send to the server.</param>
-        /// <param name="cancellationToken">A cancellation token to cancel operation.   </param>
+        /// <param name="cancellationToken">A cancellation token to cancel operation.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -142,8 +142,10 @@ namespace CloudFlareUtilities
             var pageContent = await response.Content.ReadAsStringAsync();
             var scheme = response.RequestMessage.RequestUri.Scheme;
             var host = response.RequestMessage.RequestUri.Host;
+            var port = response.RequestMessage.RequestUri.Port;
             var solution = ChallengeSolver.Solve(pageContent, host);
-            var clearanceUri = $"{scheme}://{host}{solution.ClearanceQuery}";
+
+            var clearanceUri = $"{scheme}://{host}:{port}{solution.ClearanceQuery}";
 
             await Task.Delay(5000, cancellationToken);
 
