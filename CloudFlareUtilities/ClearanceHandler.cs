@@ -108,10 +108,9 @@ namespace CloudFlareUtilities
         private static bool IsClearanceRequired(HttpResponseMessage response)
         {
             var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
-            var isCloudFlareServer = response.Headers.Server.Any(i => i.Product.Name == CloudFlareServerName);
-            var isSettingIdCookie = response.Headers.Any(h => h.Key == "Set-Cookie" && h.Value.Any(v => v.Contains(IdCookieName)));
+            var isCloudFlareServer = response.Headers.Server.Any(i => i.Product != null && i.Product.Name == CloudFlareServerName);
 
-            return isServiceUnavailable && isCloudFlareServer && isSettingIdCookie;
+            return isServiceUnavailable && isCloudFlareServer;
         }
 
         private void InjectCookies(HttpRequestMessage request)
