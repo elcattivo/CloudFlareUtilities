@@ -74,6 +74,9 @@ namespace CloudFlareUtilities
         /// <returns>The task object representing the asynchronous operation.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var IdCookieBefore = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName).FirstOrDefault();
+            var clearanceCookieBefore = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, ClearanceCookieName).FirstOrDefault();
+
             EnsureClientHeader(request);
             InjectCookies(request);
 
@@ -95,6 +98,19 @@ namespace CloudFlareUtilities
             // Clearance failed.
             if (IsClearanceRequired(response))
                 throw new CloudFlareClearanceException(retries);
+
+            var IdCookieAfter = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName).FirstOrDefault();
+            var clearanceCookieAfter = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, ClearanceCookieName).FirstOrDefault();
+
+            // inject set-cookie headers in case the cookies changed
+            if (IdCookieAfter != null && IdCookieAfter != IdCookieBefore)
+            {
+                response.Headers.Add(HttpHeader.SetCookie, IdCookieAfter.ToHeaderValue());
+            }
+            if (clearanceCookieAfter != null && clearanceCookieAfter != clearanceCookieBefore)
+            {
+                response.Headers.Add(HttpHeader.SetCookie, clearanceCookieAfter.ToHeaderValue());
+            }
 
             return response;
         }
