@@ -154,7 +154,8 @@ namespace CloudFlareUtilities
             if (response.RequestMessage.Headers.TryGetValues(HttpHeader.UserAgent, out userAgent))
                 clearanceRequest.Headers.Add(HttpHeader.UserAgent, userAgent);
 
-            await _client.SendAsync(clearanceRequest, cancellationToken);
+            var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken);
+            SaveIdCookie(passResponse); // new ID might be set as a response to the challenge in some cases
         }
 
         private void SaveIdCookie(HttpResponseMessage response)
