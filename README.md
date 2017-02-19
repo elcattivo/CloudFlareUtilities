@@ -6,6 +6,9 @@
 
 A .NET [PCL](https://msdn.microsoft.com/en-us/library/gg597391(v=vs.110).aspx) to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a [DelegatingHandler](https://msdn.microsoft.com/en-us/library/system.net.http.delegatinghandler(v=vs.110).aspx).
 
+__Contributors__
+- [kaso17](https://github.com/kaso17)
+
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)
 - Easily integrated into your project (implemented as DelegatingHandler; e.g. can be used with [HttpClient](https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118).aspx))
