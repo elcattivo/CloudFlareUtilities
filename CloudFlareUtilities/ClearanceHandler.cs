@@ -165,6 +165,18 @@ namespace CloudFlareUtilities
                 .SelectMany(pair => pair.Value)
                 .Where(cookie => cookie.StartsWith($"{IdCookieName}="));
 
+            if (cookies.Count() == 0)
+                return;
+
+            // Expire any old cloudflare cookies.
+            // If e.g.the cookie domain / path changed we'll have duplicate cookies (breaking the clearance) in some cases
+            var oldCookies = ClientHandler.CookieContainer.GetCookies(response.RequestMessage.RequestUri);
+            foreach (Cookie oldCookie in oldCookies)
+            {
+                if (oldCookie.Name == IdCookieName || oldCookie.Name == ClearanceCookieName)
+                    oldCookie.Expired = true;
+            }
+
             foreach (var cookie in cookies)
                 _cookies.SetCookies(response.RequestMessage.RequestUri, cookie);
         }
