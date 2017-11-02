@@ -8,11 +8,12 @@ A .NET [PCL](https://msdn.microsoft.com/en-us/library/gg597391(v=vs.110).aspx) t
 
 __Contributors__
 - [kaso17](https://github.com/kaso17)
+- [NathanNZ](https://github.com/nathannz)
 
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)
 - Easily integrated into your project (implemented as DelegatingHandler; e.g. can be used with [HttpClient](https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118).aspx))
-- Usable on many different platforms ([PCL Profile 111](http://portablelibraryprofiles.apps.stephencleary.com/))
+- Usable on many different platforms ([NET Standard 1.1](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard1.1.md))
 
 ## Usage
 ```csharp
