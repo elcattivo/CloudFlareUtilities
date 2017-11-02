@@ -15,6 +15,7 @@
     <RepositoryType>Git</RepositoryType>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Version>0.5.0-alpha</Version>
+    <Authors>https://github.com/elcattivo/CloudFlareUtilities/graphs/contributors</Authors>
   </PropertyGroup>
 
 </Project>
