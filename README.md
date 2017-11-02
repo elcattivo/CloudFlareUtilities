@@ -4,7 +4,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/elcattivo/CloudFlareUtilities.svg)](https://codecov.io/github/elcattivo/CloudFlareUtilities)
 [![GitHub license](https://img.shields.io/github/license/elcattivo/CloudFlareUtilities.svg)](https://raw.githubusercontent.com/elcattivo/CloudFlareUtilities/master/LICENSE)
 
-A .NET [PCL](https://msdn.microsoft.com/en-us/library/gg597391(v=vs.110).aspx) to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a [DelegatingHandler](https://msdn.microsoft.com/en-us/library/system.net.http.delegatinghandler(v=vs.110).aspx).
+A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a [DelegatingHandler](https://msdn.microsoft.com/en-us/library/system.net.http.delegatinghandler(v=vs.110).aspx).
 
 __Contributors__
 - [kaso17](https://github.com/kaso17)
