@@ -1,63 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0E2C040D-3F8D-4D96-94A4-EB752B8503C5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CloudFlareUtilities</RootNamespace>
-    <AssemblyName>CloudFlareUtilities</AssemblyName>
-    <DefaultLanguage>en-US</DefaultLanguage>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFramework>netstandard1.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a DelegatingHandler.</Description>
+    <Company>El Cattivo</Company>
+    <Product>CloudFlare Utilities</Product>
+    <Copyright>Copyright © El Cattivo 2016</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/elcattivo/CloudFlareUtilities/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/elcattivo/CloudFlareUtilities</PackageProjectUrl>
+    <PackageTags>CloudFlare HttpClient DelegatingHandler Web JavaScript DDoS Protection Challenge Bypass NETStandard</PackageTags>
+    <PackageReleaseNotes>For release notes see: https://github.com/elcattivo/CloudFlareUtilities/releases</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/elcattivo/CloudFlareUtilities</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Version>0.5.0-alpha</Version>
+    <Authors>https://github.com/elcattivo/CloudFlareUtilities/graphs/contributors</Authors>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>
-    </DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\CloudFlareUtilities.xml</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ChallengeSolution.cs" />
-    <Compile Include="ClearanceHandler.cs" />
-    <Compile Include="CloudflareClearanceException.cs" />
-    <Compile Include="CookieExtensions.cs" />
-    <Compile Include="HttpHeader.cs" />
-    <Compile Include="ChallengeSolver.cs" />
-    <Compile Include="HttpMessageHandlerExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

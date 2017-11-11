@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CloudFlareUtilities.Tests
@@ -100,8 +101,16 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         public void ApplyDecodingStepOnUnknownOperatorThrowsArgumentOutOfRangeException()
         {
             const string invalidOperator = "%";
-            var solverType = new PrivateType(typeof (ChallengeSolver));
-            solverType.InvokeStatic("ApplyDecodingStep", 323, Tuple.Create(invalidOperator, 32));
+            try
+            {
+                var solverType = new PrivateType(typeof(ChallengeSolver));
+                solverType.InvokeStatic("ApplyDecodingStep", 323, Tuple.Create(invalidOperator, 32));
+            }
+            //We're calling this with reflection, so we have to throw up the TargetInvocationException to represent what would actually occur.
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
         }
     }
 }
