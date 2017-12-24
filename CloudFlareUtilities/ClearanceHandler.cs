@@ -21,7 +21,7 @@ namespace CloudFlareUtilities
         /// </summary>
         public static readonly int DefaultMaxRetries = 3;
 
-        private const string CloudFlareServerName = "cloudflare-nginx";
+        private static readonly IEnumerable<string> CloudFlareServerNames = new[] { "cloudflare", "cloudflare-nginx" };
         private const string IdCookieName = "__cfduid";
         private const string ClearanceCookieName = "cf_clearance";
 
@@ -124,7 +124,8 @@ namespace CloudFlareUtilities
         private static bool IsClearanceRequired(HttpResponseMessage response)
         {
             var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
-            var isCloudFlareServer = response.Headers.Server.Any(i => i.Product != null && i.Product.Name == CloudFlareServerName);
+            var isCloudFlareServer = response.Headers.Server
+                .Any(i => i.Product != null && CloudFlareServerNames.Any(s => string.Compare(s, i.Product.Name, System.StringComparison.OrdinalIgnoreCase) == 0));
 
             return isServiceUnavailable && isCloudFlareServer;
         }
