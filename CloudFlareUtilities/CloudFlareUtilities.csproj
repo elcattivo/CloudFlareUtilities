@@ -6,7 +6,7 @@
     <Description>A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a DelegatingHandler.</Description>
     <Company>El Cattivo</Company>
     <Product>CloudFlare Utilities</Product>
-    <Copyright>Copyright © El Cattivo 2016</Copyright>
+    <Copyright>Copyright © El Cattivo 2017</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/elcattivo/CloudFlareUtilities/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/elcattivo/CloudFlareUtilities</PackageProjectUrl>
     <PackageTags>CloudFlare HttpClient DelegatingHandler Web JavaScript DDoS Protection Challenge Bypass NETStandard</PackageTags>
@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/elcattivo/CloudFlareUtilities</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Version>0.5.0-alpha</Version>
+    <Version>1.0.0</Version>
     <Authors>https://github.com/elcattivo/CloudFlareUtilities/graphs/contributors</Authors>
   </PropertyGroup>
 
