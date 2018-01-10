@@ -9,6 +9,7 @@ A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript cha
 __Contributors__
 - [kaso17](https://github.com/kaso17)
 - [NathanNZ](https://github.com/nathannz)
+- [twix20](https://github.com/twix20)
 
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)
