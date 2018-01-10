@@ -1,7 +1,6 @@
 # CloudFlare Utilities
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/CloudFlareUtilities.svg)](https://www.nuget.org/packages/CloudFlareUtilities/)
 [![AppVeyor](https://img.shields.io/appveyor/ci/elcattivo/CloudFlareUtilities.svg)](https://ci.appveyor.com/project/elcattivo/cloudflareutilities)
-[![Codecov](https://img.shields.io/codecov/c/github/elcattivo/CloudFlareUtilities.svg)](https://codecov.io/github/elcattivo/CloudFlareUtilities)
 [![GitHub license](https://img.shields.io/github/license/elcattivo/CloudFlareUtilities.svg)](https://raw.githubusercontent.com/elcattivo/CloudFlareUtilities/master/LICENSE)
 
 A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a [DelegatingHandler](https://msdn.microsoft.com/en-us/library/system.net.http.delegatinghandler(v=vs.110).aspx).
