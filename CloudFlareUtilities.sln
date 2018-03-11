@@ -5,11 +5,16 @@ VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{35AE7C83-F762-4ACE-8F68-681095A06B6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareUtilities", "CloudFlareUtilities\CloudFlareUtilities.csproj", "{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities", "CloudFlareUtilities\CloudFlareUtilities.csproj", "{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareUtilities.ClearanceExample", "CloudFlareUtilities.ClearanceExample\CloudFlareUtilities.ClearanceExample.csproj", "{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities.ClearanceExample", "CloudFlareUtilities.ClearanceExample\CloudFlareUtilities.ClearanceExample.csproj", "{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareUtilities.Tests", "CloudFlareUtilities.Tests\CloudFlareUtilities.Tests.csproj", "{0F413149-149B-4F2D-BF43-112B761E7C66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities.Tests", "CloudFlareUtilities.Tests\CloudFlareUtilities.Tests.csproj", "{0F413149-149B-4F2D-BF43-112B761E7C66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{92E6C09A-334C-4F74-9BDD-A6DB185A1F92}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
