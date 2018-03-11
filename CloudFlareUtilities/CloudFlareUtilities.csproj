@@ -13,8 +13,8 @@
     <PackageReleaseNotes>For release notes see: https://github.com/elcattivo/CloudFlareUtilities/releases</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/elcattivo/CloudFlareUtilities</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Version>1.0.1</Version>
     <Authors>https://github.com/elcattivo/CloudFlareUtilities/graphs/contributors</Authors>
   </PropertyGroup>
 
