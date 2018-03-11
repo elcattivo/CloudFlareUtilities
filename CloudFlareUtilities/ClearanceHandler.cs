@@ -155,7 +155,7 @@ namespace CloudFlareUtilities
         {
             SaveIdCookie(response);
 
-            var pageContent = await response.Content.ReadAsStringAsync();
+            var pageContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var scheme = response.RequestMessage.RequestUri.Scheme;
             var host = response.RequestMessage.RequestUri.Host;
             var port = response.RequestMessage.RequestUri.Port;
