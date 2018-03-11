@@ -80,7 +80,7 @@ namespace CloudFlareUtilities
             EnsureClientHeader(request);
             InjectCookies(request);
 
-            var response = await base.SendAsync(request, cancellationToken);
+            var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // (Re)try clearance if required.
             var retries = 0;
@@ -88,9 +88,9 @@ namespace CloudFlareUtilities
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                await PassClearance(response, cancellationToken);
+                await PassClearance(response, cancellationToken).ConfigureAwait(false);
                 InjectCookies(request);
-                response = await base.SendAsync(request, cancellationToken);
+                response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
                 retries++;
             }
@@ -163,7 +163,7 @@ namespace CloudFlareUtilities
 
             var clearanceUri = $"{scheme}://{host}:{port}{solution.ClearanceQuery}";
 
-            await Task.Delay(5000, cancellationToken);
+            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
 
             var clearanceRequest = new HttpRequestMessage(HttpMethod.Get, clearanceUri);
 
@@ -171,7 +171,7 @@ namespace CloudFlareUtilities
             if (response.RequestMessage.Headers.TryGetValues(HttpHeader.UserAgent, out userAgent))
                 clearanceRequest.Headers.Add(HttpHeader.UserAgent, userAgent);
 
-            var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken);
+            var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken).ConfigureAwait(false);
             SaveIdCookie(passResponse); // new ID might be set as a response to the challenge in some cases
         }
 
