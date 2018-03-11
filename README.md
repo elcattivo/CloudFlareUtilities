@@ -9,6 +9,7 @@ __Contributors__
 - [kaso17](https://github.com/kaso17)
 - [NathanNZ](https://github.com/nathannz)
 - [twix20](https://github.com/twix20)
+- [kade-robertson](https://github.com/kade-robertson)
 
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)
