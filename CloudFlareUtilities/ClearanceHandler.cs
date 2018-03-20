@@ -21,6 +21,11 @@ namespace CloudFlareUtilities
         /// </summary>
         public static readonly int DefaultMaxRetries = 3;
 
+        /// <summary>
+        /// The default number of milliseconds to wait before sending the clearance request.
+        /// </summary>
+        public static readonly int DefaultClearanceDelay = 5000;
+
         private static readonly IEnumerable<string> CloudFlareServerNames = new[] { "cloudflare", "cloudflare-nginx" };
         private const string IdCookieName = "__cfduid";
         private const string ClearanceCookieName = "cf_clearance";
@@ -51,6 +56,11 @@ namespace CloudFlareUtilities
         /// </summary>
         /// <remarks>A negative value causes an infinite amount of retries.</remarks>
         public int MaxRetries { get; set; } = DefaultMaxRetries;
+
+        /// <summary>
+        /// Gets or sets the number of milliseconds to wait before sending the clearance request.
+        /// </summary>
+        public int ClearanceDelay { get; set; } = DefaultClearanceDelay;
 
         private HttpClientHandler ClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
@@ -163,7 +173,7 @@ namespace CloudFlareUtilities
 
             var clearanceUri = $"{scheme}://{host}:{port}{solution.ClearanceQuery}";
 
-            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+            await Task.Delay(ClearanceDelay, cancellationToken).ConfigureAwait(false);
 
             var clearanceRequest = new HttpRequestMessage(HttpMethod.Get, clearanceUri);
 
