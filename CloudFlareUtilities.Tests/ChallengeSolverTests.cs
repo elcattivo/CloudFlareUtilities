@@ -11,9 +11,10 @@ namespace CloudFlareUtilities.Tests
         private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
         private const string Pass = "1458515751.766-rbEAC9yDbP";
         private const string ClearancePage = "/cdn-cgi/l/chk_jschl";
-        private const int ValidAnswer = 293;
+        private const int ValidIntegerAnswer = 293;
+        private const double ValidFloatAnswer = 47.1687814926;
 
-        private const string JavaScriptData =
+        private const string IntegerChallengeScript =
 @"<script type=""text/javascript"">
   //<![CDATA[
   (function(){
@@ -37,7 +38,32 @@ namespace CloudFlareUtilities.Tests
   //]]>
 </script>";
 
-        private static readonly string FormData =
+        private const string FloatChallengeScript =
+@"<script type=""text/javascript"">
+  //<![CDATA[
+  (function(){
+    var a = function() {try{return !!window.addEventListener} catch(e) {return !1} },
+    b = function(b, c) {a() ? document.addEventListener(""DOMContentLoaded"", b, c) : document.attachEvent(""onreadystatechange"", b)};
+    b(function(){
+      var a = document.getElementById('cf-content');a.style.display = 'block';
+      setTimeout(function(){
+        var s,t,o,p,b,r,e,a,k,i,n,g,f, bnuYckT={""VcNScacY"":+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(+!![])+(+[])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[]))};
+        t = document.createElement('div');
+        t.innerHTML=""<a href='/'>x</a>"";
+        t = t.firstChild.href;r = t.match(/https?:\/\//)[0];
+        t = t.substr(r.length); t = t.substr(0,t.length-1);
+        a = document.getElementById('jschl-answer');
+        f = document.getElementById('challenge-form');
+        ;bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]))/+((!+[]+!![]+[])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(+[])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY+=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(+[]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]));bnuYckT.VcNScacY-=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]));bnuYckT.VcNScacY-=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY+=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+[])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]));a.value = +bnuYckT.VcNScacY.toFixed(10) + t.length; '; 121'
+        f.action += location.hash;
+        f.submit();
+      }, 4000);
+    }, false);
+  })();
+  //]]>
+</script>";
+
+        private static readonly string Form =
 $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
     <input type=""hidden"" name=""jschl_vc"" value=""{VerificationCode}""/>
     <input type=""hidden"" name=""pass"" value=""{Pass}""/>
@@ -45,19 +71,29 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
 </form>";
 
         [TestMethod]
-        public void SolveReturnsValidAnswer()
+        public void SolveReturnsValidIntegerAnswer()
         {
-            var pageContent = JavaScriptData + FormData;
+            var pageContent = IntegerChallengeScript + Form;
 
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
-            Assert.AreEqual(ValidAnswer, solution.Answer);
+            Assert.AreEqual(ValidIntegerAnswer, solution.Answer);
+        }
+
+        [TestMethod]
+        public void SolveReturnsValidFloatAnswer()
+        {
+            var pageContent = FloatChallengeScript + Form;
+
+            var solution = ChallengeSolver.Solve(pageContent, Host);
+
+            Assert.AreEqual(ValidFloatAnswer, solution.Answer);
         }
 
         [TestMethod]
         public void SolveReturnsVerificationCode()
         {
-            var pageContent = JavaScriptData + FormData;
+            var pageContent = IntegerChallengeScript + Form;
 
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
@@ -67,7 +103,7 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsPass()
         {
-            var pageContent = JavaScriptData + FormData;
+            var pageContent = IntegerChallengeScript + Form;
 
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
@@ -77,7 +113,7 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsClearancePage()
         {
-            var pageContent = JavaScriptData + FormData;
+            var pageContent = IntegerChallengeScript + Form;
 
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
@@ -87,12 +123,12 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
         [TestMethod]
         public void SolveReturnsValidClearanceQuery()
         {
-            var pageContent = JavaScriptData + FormData;
+            var pageContent = IntegerChallengeScript + Form;
 
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(
-                $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidAnswer}",
+                $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidIntegerAnswer}",
                 solution.ClearanceQuery);
         }
 
@@ -104,7 +140,7 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             try
             {
                 var solverType = new PrivateType(typeof(ChallengeSolver));
-                solverType.InvokeStatic("ApplyDecodingStep", 323, Tuple.Create(invalidOperator, 32));
+                solverType.InvokeStatic("ApplyDecodingStep", 323D, Tuple.Create(invalidOperator, 32D));
             }
             //We're calling this with reflection, so we have to throw up the TargetInvocationException to represent what would actually occur.
             catch (TargetInvocationException e)

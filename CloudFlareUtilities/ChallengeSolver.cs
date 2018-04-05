@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,12 +10,15 @@ namespace CloudFlareUtilities
     /// </summary>
     public static class ChallengeSolver
     {
-        private const string ScriptTagPattern = @"<script\b[^>]*>(?<Content>.*?)<\/script>";
-        private const string ObfuscatedNumberPattern = @"(?<Number>[\(\)\+\!\[\]]+)";
-        private const string SimplifiedObfuscatedDigitPattern = @"\([1+[\]]+\)";
-        private const string SeedPattern = ":" + ObfuscatedNumberPattern;
-        private const string OperatorPattern = @"(?<Operator>[\+\-\*\/]{1})\=";
-        private const string StepPattern = OperatorPattern + ObfuscatedNumberPattern;
+        private const string IntegerSolutionTag = "parseInt(";
+
+        private const string ScriptPattern = @"<script\b[^>]*>(?<Content>.*?)<\/script>";
+        private const string ZeroPattern = @"\[\]";
+        private const string OnePattern = @"\!\+\[\]|\!\!\[\]";
+        private const string DigitPattern = @"\(?(\+?(" + OnePattern + @"|" + ZeroPattern + @"))+\)?";
+        private const string NumberPattern = @"\+?\(?(?<Digits>\+?" + DigitPattern + @")+\)?";
+        private const string OperatorPattern = @"(?<Operator>[\+|\-|\*|\/])\=?";
+        private const string StepPattern = @"(" + OperatorPattern + @")??(?<Number>" + NumberPattern + ")";
 
         /// <summary>
         /// Solves the given JavaScript challenge.
@@ -27,50 +31,59 @@ namespace CloudFlareUtilities
             var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost);
             var jschlVc = Regex.Match(challengePageContent, "name=\"jschl_vc\" value=\"(?<jschl_vc>[^\"]+)").Groups["jschl_vc"].Value;
             var pass = Regex.Match(challengePageContent, "name=\"pass\" value=\"(?<pass>[^\"]+)").Groups["pass"].Value;
-            var clearancePage = Regex.Match(challengePageContent, "id=\"challenge-form\" action=\"(?<action>[^\"]+)").Groups["action"].Value;            
+            var clearancePage = Regex.Match(challengePageContent, "id=\"challenge-form\" action=\"(?<action>[^\"]+)").Groups["action"].Value;
 
             return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer);
         }
 
-        private static int DecodeSecretNumber(string challengePageContent, string targetHost)
+        private static double DecodeSecretNumber(string challengePageContent, string targetHost)
         {
-            var challengeScript = Regex.Matches(challengePageContent, ScriptTagPattern, RegexOptions.Singleline)
+            var script = Regex.Matches(challengePageContent, ScriptPattern, RegexOptions.Singleline)
                 .Cast<Match>().Select(m => m.Groups["Content"].Value)
                 .First(c => c.Contains("jschl-answer"));
-            var seed = DeobfuscateNumber(Regex.Match(challengeScript, SeedPattern).Groups["Number"].Value);
-            var steps = Regex.Matches(challengeScript, StepPattern).Cast<Match>()
-                .Select(s => new Tuple<string, int>(s.Groups["Operator"].Value, DeobfuscateNumber(s.Groups["Number"].Value)));
-            var secretNumber = steps.Aggregate(seed, ApplyDecodingStep) + targetHost.Length;
 
-            return secretNumber;
+            var statements = script.Split(';');
+            var stepGroups = statements.Select(GetSteps).Where(g => g.Any()).ToList();
+            var steps = stepGroups.Select(ResolveStepGroup).ToList();
+            var seed = steps.First().Item2;
+
+            var secretNumber = Math.Round(steps.Skip(1).Aggregate(seed, ApplyDecodingStep), 10) + targetHost.Length;
+
+            return script.Contains(IntegerSolutionTag) ? (int)secretNumber : secretNumber;
         }
 
-        private static int DeobfuscateNumber(string obfuscatedNumber)
+        private static Tuple<string, double> ResolveStepGroup(IEnumerable<Tuple<string, double>> group)
         {
-            var simplifiedObfuscatedNumber = SimplifyObfuscatedNumber(obfuscatedNumber);
+            var steps = group.ToList();
+            var op = steps.First().Item1;
+            var seed = steps.First().Item2;
 
-            if (!simplifiedObfuscatedNumber.Contains("("))
-                return CountOnes(simplifiedObfuscatedNumber);
+            var operand = steps.Skip(1).Aggregate(seed, ApplyDecodingStep);
 
-            var digitMatches = Regex.Matches(simplifiedObfuscatedNumber, SimplifiedObfuscatedDigitPattern);
-            var numberAsText = digitMatches.Cast<Match>()
-                .Select(m => CountOnes(m.Value))
-                .Aggregate(string.Empty, (number, digit) => number + digit);
-
-            return int.Parse(numberAsText);
+            return Tuple.Create(op, operand);
         }
 
-        private static string SimplifyObfuscatedNumber(string obfuscatedNumber)
+        private static IEnumerable<Tuple<string, double>> GetSteps(string text)
         {
-            return obfuscatedNumber.Replace("!![]", "1").Replace("!+[]", "1");
+            var steps = Regex.Matches(text, StepPattern).Cast<Match>()
+                .Select(s => Tuple.Create(s.Groups["Operator"].Value, DeobfuscateNumber(s.Groups["Number"].Value)))
+                .ToList();
+
+            return steps;
         }
 
-        private static int CountOnes(string obfuscatedNumber)
+        private static double DeobfuscateNumber(string obfuscatedNumber)
         {
-            return obfuscatedNumber.ToCharArray().Count(c => c == '1');
+            var digits = Regex.Match(obfuscatedNumber, NumberPattern)
+                .Groups["Digits"].Captures.Cast<Capture>()
+                .Select(c => Regex.Matches(c.Value, OnePattern).Count);
+
+            var number = double.Parse(string.Join(string.Empty, digits));
+
+            return number;
         }
 
-        private static int ApplyDecodingStep(int number, Tuple<string, int> step)
+        private static double ApplyDecodingStep(double number, Tuple<string, double> step)
         {
             var op = step.Item1;
             var operand = step.Item2;

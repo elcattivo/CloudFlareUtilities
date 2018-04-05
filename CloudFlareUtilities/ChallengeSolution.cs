@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace CloudFlareUtilities
 {
@@ -7,7 +8,7 @@ namespace CloudFlareUtilities
     /// </summary>
     public struct ChallengeSolution : IEquatable<ChallengeSolution>
     {
-        public ChallengeSolution(string clearancePage, string verificationCode, string pass, int answer)
+        public ChallengeSolution(string clearancePage, string verificationCode, string pass, double answer)
         {
             ClearancePage = clearancePage;
             VerificationCode = verificationCode;
@@ -21,9 +22,9 @@ namespace CloudFlareUtilities
 
         public string Pass { get; }
 
-        public int Answer { get; }
+        public double Answer { get; }
 
-        public string ClearanceQuery => $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer}";
+        public string ClearanceQuery => $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString(CultureInfo.InvariantCulture)}";
 
         public static bool operator ==(ChallengeSolution solutionA, ChallengeSolution solutionB)
         {
