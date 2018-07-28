@@ -11,9 +11,14 @@ namespace CloudFlareUtilities.ClearanceExample
             var target = new Uri(args[0]);
 
             var handler = new ClearanceHandler();
-            //handler.MaxRetries = ClearanceHandler.DefaultMaxRetries;
 
             var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36 OPR/54.0.2952.60");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Referer", target.Host);
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Upgrade-Insecure-Requests", "1");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Connection", "keep-alive");
 
             try
             {
