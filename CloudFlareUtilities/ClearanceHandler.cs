@@ -177,9 +177,13 @@ namespace CloudFlareUtilities
 
             var clearanceRequest = new HttpRequestMessage(HttpMethod.Get, clearanceUri);
 
-            if (response.RequestMessage.Headers.TryGetValues(HttpHeader.UserAgent, out var userAgent))
-                clearanceRequest.Headers.Add(HttpHeader.UserAgent, userAgent);
-
+            clearanceRequest.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36 OPR/54.0.2952.60");
+            clearanceRequest.Headers.TryAddWithoutValidation("Referer", host);
+            clearanceRequest.Headers.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            clearanceRequest.Headers.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
+            clearanceRequest.Headers.TryAddWithoutValidation("Upgrade-Insecure-Requests", "1");
+            clearanceRequest.Headers.TryAddWithoutValidation("Connection", "keep-alive");
+            
             var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken).ConfigureAwait(false);
             SaveIdCookie(passResponse); // new ID might be set as a response to the challenge in some cases
         }
