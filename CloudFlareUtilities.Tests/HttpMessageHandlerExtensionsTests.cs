@@ -20,7 +20,7 @@ namespace CloudFlareUtilities.Tests
         public void GetMostInnerHandlerOnDelegatingHandlerReturnsInnerHandler()
         {
             var innerHandler = new HttpClientHandler();
-            var handler = new ClearanceHandler(innerHandler);
+            var handler = new ClearanceHandler(innerHandler, new System.Net.CookieContainer());
 
             var mostInnerHandler = handler.GetMostInnerHandler();
 

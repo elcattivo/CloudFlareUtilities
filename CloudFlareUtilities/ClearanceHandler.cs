@@ -42,8 +42,11 @@ namespace CloudFlareUtilities
         /// Creates a new instance of the <see cref="ClearanceHandler"/> class with a specific inner handler.
         /// </summary>
         /// <param name="innerHandler">The inner handler which is responsible for processing the HTTP response messages.</param>
-        public ClearanceHandler(HttpMessageHandler innerHandler) : base(innerHandler)
+        /// <param name="cookies">The optional initial cookie container which can contain other cookies to send with the requests</param>
+        public ClearanceHandler(HttpMessageHandler innerHandler, CookieContainer cookies = null) : base(innerHandler)
         {
+            _cookies = cookies ?? _cookies;
+
             _client = new HttpClient(new HttpClientHandler
             {
                 AllowAutoRedirect = false,
