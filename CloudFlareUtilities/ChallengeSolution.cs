@@ -28,7 +28,9 @@ namespace CloudFlareUtilities
         public double Answer { get; }
 
         // Using .ToString("R") to reduse answer rounding
-        public string ClearanceQuery => $"{ClearancePage}?s={S}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";
+        public string ClearanceQuery => S is null ? 
+            $"{ClearancePage}?s={S}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}" :
+            $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";
 
         public static bool operator ==(ChallengeSolution solutionA, ChallengeSolution solutionB)
         {
