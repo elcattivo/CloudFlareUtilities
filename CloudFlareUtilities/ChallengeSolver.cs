@@ -31,9 +31,10 @@ namespace CloudFlareUtilities
             var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost);
             var jschlVc = Regex.Match(challengePageContent, "name=\"jschl_vc\" value=\"(?<jschl_vc>[^\"]+)").Groups["jschl_vc"].Value;
             var pass = Regex.Match(challengePageContent, "name=\"pass\" value=\"(?<pass>[^\"]+)").Groups["pass"].Value;
+            var s = Regex.Match(challengePageContent, "name=\"s\" value=\"(?<s>[^\"]+)").Groups["s"].Value;
             var clearancePage = Regex.Match(challengePageContent, "id=\"challenge-form\" action=\"(?<action>[^\"]+)").Groups["action"].Value;
 
-            return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer);
+            return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer, s);
         }
 
         private static double DecodeSecretNumber(string challengePageContent, string targetHost)
