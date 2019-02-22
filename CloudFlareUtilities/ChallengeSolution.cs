@@ -28,7 +28,7 @@ namespace CloudFlareUtilities
         public double Answer { get; }
 
         // Using .ToString("R") to reduse answer rounding
-        public string ClearanceQuery => !(S is null) ? 
+        public string ClearanceQuery => !(string.IsNullOrEmpty(S)) ? 
             $"{ClearancePage}?s={S}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}" :
             $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";
 
