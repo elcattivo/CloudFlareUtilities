@@ -128,7 +128,7 @@ namespace CloudFlareUtilities
         private static void EnsureClientHeader(HttpRequestMessage request)
         {
             if (!request.Headers.UserAgent.Any())
-                request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Client", "1.0"));
+                request.Headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
         }
 
         private static bool IsClearanceRequired(HttpResponseMessage response)
@@ -179,6 +179,12 @@ namespace CloudFlareUtilities
 
             if (response.RequestMessage.Headers.TryGetValues(HttpHeader.UserAgent, out var userAgent))
                 clearanceRequest.Headers.Add(HttpHeader.UserAgent, userAgent);
+
+            if (response.RequestMessage.RequestUri != null)
+                clearanceRequest.Headers.Add("Referer", response.RequestMessage.RequestUri.ToString());
+
+            clearanceRequest.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            clearanceRequest.Headers.Add("Upgrade-Insecure-Requests", "1");
 
             var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken).ConfigureAwait(false);
             SaveIdCookie(passResponse); // new ID might be set as a response to the challenge in some cases

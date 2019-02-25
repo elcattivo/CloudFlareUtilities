@@ -10,6 +10,7 @@ namespace CloudFlareUtilities.Tests
         private const string Host = "domain.tld";
         private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
         private const string Pass = "1458515751.766-rbEAC9yDbP";
+        private const string S = "a33e1579d603680391f081b33f86e478ba3375bb-1550232454-1800-Ae6ohrZmyMZv%2BClUP8pj5kzeYebjJcr%2BmAKyA8WvsjXgV2v3L7FTTCpgSPxCqXZyM9VivmO4%2BPwvqnAvTnykCTQ%2B9Vde61lJZuuxA6WulIwr";
         private const string ClearancePage = "/cdn-cgi/l/chk_jschl";
         private const int ValidIntegerAnswer = 293;
         private const double ValidFloatAnswer = 47.1687814926;
@@ -67,6 +68,7 @@ namespace CloudFlareUtilities.Tests
 $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
     <input type=""hidden"" name=""jschl_vc"" value=""{VerificationCode}""/>
     <input type=""hidden"" name=""pass"" value=""{Pass}""/>
+<input type=""hidden"" name=""s"" value=""{S}""/>
     <input type=""hidden"" id=""jschl-answer"" name=""jschl_answer""/>
 </form>";
 
@@ -128,7 +130,7 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(
-                $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidIntegerAnswer}",
+                $"{ClearancePage}?s={Uri.EscapeDataString(S)}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidIntegerAnswer}",
                 solution.ClearanceQuery);
         }
 
