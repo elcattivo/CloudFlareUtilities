@@ -8,9 +8,10 @@ namespace CloudFlareUtilities
     /// </summary>
     public struct ChallengeSolution : IEquatable<ChallengeSolution>
     {
-        public ChallengeSolution(string clearancePage, string verificationCode, string pass, double answer)
+        public ChallengeSolution(string clearancePage, string verificationCode, string pass, double answer, string s)
         {
             ClearancePage = clearancePage;
+            S = s;
             VerificationCode = verificationCode;
             Pass = pass;
             Answer = answer;
@@ -22,10 +23,14 @@ namespace CloudFlareUtilities
 
         public string Pass { get; }
 
+        public string S { get; }
+
         public double Answer { get; }
 
         // Using .ToString("R") to reduse answer rounding
-        public string ClearanceQuery => $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";
+        public string ClearanceQuery => !(string.IsNullOrEmpty(S)) ?
+            $"{ClearancePage}?s={Uri.EscapeDataString(S)}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}" :
+            $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";
 
         public static bool operator ==(ChallengeSolution solutionA, ChallengeSolution solutionB)
         {
@@ -46,7 +51,7 @@ namespace CloudFlareUtilities
         public override int GetHashCode()
         {
             return ClearanceQuery.GetHashCode();
-        }       
+        }
 
         public bool Equals(ChallengeSolution other)
         {
