@@ -8,12 +8,17 @@ namespace CloudFlareUtilities.Tests
     public class ChallengeSolverTests
     {
         private const string Host = "domain.tld";
+        private const int CustomPort = 8080;
         private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
         private const string Pass = "1458515751.766-rbEAC9yDbP";
         private const string S = "a33e1579d603680391f081b33f86e478ba3375bb-1550232454-1800-Ae6ohrZmyMZv%2BClUP8pj5kzeYebjJcr%2BmAKyA8WvsjXgV2v3L7FTTCpgSPxCqXZyM9VivmO4%2BPwvqnAvTnykCTQ%2B9Vde61lJZuuxA6WulIwr";
         private const string ClearancePage = "/cdn-cgi/l/chk_jschl";
+        
         private const int ValidIntegerAnswer = 293;
         private const double ValidFloatAnswer = 47.1687814926;
+
+        private readonly int _validIntegerAnswerCustomPort = ValidIntegerAnswer + CustomPort.ToString().Length + 1; // + 1 because we have column: hostname:port
+        private readonly double _validFloatAnswerCustomPort = ValidFloatAnswer + CustomPort.ToString().Length + 1; // + 1 because we have column: hostname:port
 
         private const string IntegerChallengeScript =
 @"<script type=""text/javascript"">
@@ -80,6 +85,11 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(ValidIntegerAnswer, solution.Answer);
+
+
+            var solutionCustomPort = ChallengeSolver.Solve(pageContent, Host, CustomPort);
+
+            Assert.AreEqual(_validIntegerAnswerCustomPort, solutionCustomPort.Answer);
         }
 
         [TestMethod]
@@ -90,6 +100,10 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             var solution = ChallengeSolver.Solve(pageContent, Host);
 
             Assert.AreEqual(ValidFloatAnswer, solution.Answer);
+
+            var solutionCustomPort = ChallengeSolver.Solve(pageContent, Host, CustomPort);
+
+            Assert.AreEqual(_validFloatAnswerCustomPort, solutionCustomPort.Answer);
         }
 
         [TestMethod]
@@ -147,7 +161,10 @@ $@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
             //We're calling this with reflection, so we have to throw up the TargetInvocationException to represent what would actually occur.
             catch (TargetInvocationException e)
             {
-                throw e.InnerException;
+                if (e.InnerException != null)
+                    throw e.InnerException;
+
+                throw new ArgumentNullException(nameof(e.InnerException));
             }
         }
     }

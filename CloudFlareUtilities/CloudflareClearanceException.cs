@@ -3,6 +3,7 @@ using System.Net.Http;
 
 namespace CloudFlareUtilities
 {
+    /// <inheritdoc />
     /// <summary>
     /// The exception that is thrown if CloudFlare clearance failed after the declared number of attempts.
     /// </summary>

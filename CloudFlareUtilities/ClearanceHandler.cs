@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudFlareUtilities
 {
+    /// <inheritdoc />
     /// <summary>
     /// A HTTP handler that transparently manages Cloudflare's Anti-DDoS measure.
     /// </summary>
@@ -113,11 +113,11 @@ namespace CloudFlareUtilities
             var clearanceCookieAfter = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, ClearanceCookieName).FirstOrDefault();
 
             // inject set-cookie headers in case the cookies changed
-            if (idCookieAfter != null && idCookieAfter != idCookieBefore)
+            if (idCookieAfter != null && !Equals(idCookieAfter, idCookieBefore))
             {
                 response.Headers.Add(HttpHeader.SetCookie, idCookieAfter.ToHeaderValue());
             }
-            if (clearanceCookieAfter != null && clearanceCookieAfter != clearanceCookieBefore)
+            if (clearanceCookieAfter != null && !Equals(clearanceCookieAfter, clearanceCookieBefore))
             {
                 response.Headers.Add(HttpHeader.SetCookie, clearanceCookieAfter.ToHeaderValue());
             }
@@ -169,7 +169,7 @@ namespace CloudFlareUtilities
             var scheme = response.RequestMessage.RequestUri.Scheme;
             var host = response.RequestMessage.RequestUri.Host;
             var port = response.RequestMessage.RequestUri.Port;
-            var solution = ChallengeSolver.Solve(pageContent, host);
+            var solution = ChallengeSolver.Solve(pageContent, host, port);
 
             var clearanceUri = $"{scheme}://{host}:{port}{solution.ClearanceQuery}";
 

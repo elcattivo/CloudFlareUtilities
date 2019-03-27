@@ -13,6 +13,7 @@ __Contributors__
 - [twix20](https://github.com/twix20)
 - [kade-robertson](https://github.com/kade-robertson)
 - [Eric898989](https://github.com/Eric898989)
+- [Grand Silence](https://github.com/grandsilence)
 
 ## Features
 - No dependencies (e.g. no external JavaScript interpreter required)

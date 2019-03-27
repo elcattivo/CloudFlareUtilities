@@ -25,10 +25,11 @@ namespace CloudFlareUtilities
         /// </summary>
         /// <param name="challengePageContent">The HTML content of the clearance page, which contains the challenge.</param>
         /// <param name="targetHost">The hostname of the protected website.</param>
+        /// <param name="targetPort">Port of the protected website. When targetPort number is default (HTTP 80 or SSL 443) the parameter can be ignored (or equal 0).</param>
         /// <returns>The solution.</returns>
-        public static ChallengeSolution Solve(string challengePageContent, string targetHost)
+        public static ChallengeSolution Solve(string challengePageContent, string targetHost, int targetPort = 0)
         {
-            var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost);
+            var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost, targetPort);
             var jschlVc = Regex.Match(challengePageContent, "name=\"jschl_vc\" value=\"(?<jschl_vc>[^\"]+)").Groups["jschl_vc"].Value;
             var pass = Regex.Match(challengePageContent, "name=\"pass\" value=\"(?<pass>[^\"]+)").Groups["pass"].Value;
             var s = Regex.Match(challengePageContent, "name=\"s\" value=\"(?<s>[^\"]+)").Groups["s"].Value;
@@ -37,7 +38,7 @@ namespace CloudFlareUtilities
             return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer, s);
         }
 
-        private static double DecodeSecretNumber(string challengePageContent, string targetHost)
+        private static double DecodeSecretNumber(string challengePageContent, string targetHost, int targetPort)
         {
             var script = Regex.Matches(challengePageContent, ScriptPattern, RegexOptions.Singleline)
                 .Cast<Match>().Select(m => m.Groups["Content"].Value)
@@ -49,6 +50,9 @@ namespace CloudFlareUtilities
             var seed = steps.First().Item2;
 
             var secretNumber = Math.Round(steps.Skip(1).Aggregate(seed, ApplyDecodingStep), 10) + targetHost.Length;
+            // In JS targetHost can contain port when it isn't default (not HTTP 80 and not SSL 443)
+            if (targetPort != 0 && targetPort != 80 && targetPort != 443)
+                secretNumber += targetPort.ToString().Length + 1; // +1 because we have colon in JS targetHost = "host:targetPort"
 
             return script.Contains(IntegerSolutionTag) ? (int)secretNumber : secretNumber;
         }
