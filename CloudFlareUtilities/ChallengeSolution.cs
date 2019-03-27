@@ -3,6 +3,7 @@ using System.Globalization;
 
 namespace CloudFlareUtilities
 {
+    /// <inheritdoc cref="IEquatable{T}" />
     /// <summary>
     /// Holds the information, which is required to pass the CloudFlare clearance.
     /// </summary>
@@ -27,7 +28,7 @@ namespace CloudFlareUtilities
 
         public double Answer { get; }
 
-        // Using .ToString("R") to reduse answer rounding
+        // Using .ToString("R") to reduce answer rounding
         public string ClearanceQuery => !(string.IsNullOrEmpty(S)) ?
             $"{ClearancePage}?s={Uri.EscapeDataString(S)}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}" :
             $"{ClearancePage}?jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={Answer.ToString("R", CultureInfo.InvariantCulture)}";

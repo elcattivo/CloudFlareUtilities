@@ -6,9 +6,13 @@ namespace CloudFlareUtilities
     {
         public static HttpMessageHandler GetMostInnerHandler(this HttpMessageHandler self)
         {
-            return self is DelegatingHandler handler
-                ? handler.InnerHandler.GetMostInnerHandler()
-                : self;
+            while (true)
+            {
+                if (!(self is DelegatingHandler handler)) 
+                    return self;
+
+                self = handler.InnerHandler;
+            }
         }
     }
 }
