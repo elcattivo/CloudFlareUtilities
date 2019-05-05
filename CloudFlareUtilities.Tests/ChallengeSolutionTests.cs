@@ -9,7 +9,7 @@ namespace CloudFlareUtilities.Tests
         private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
         private const string Pass = "1458515751.766-rbEAC9yDbP";
         private const string S = "a33e1579d603680391f081b33f86e478ba3375bb-1550232454-1800-Ae6ohrZmyMZv%2BClUP8pj5kzeYebjJcr%2BmAKyA8WvsjXgV2v3L7FTTCpgSPxCqXZyM9VivmO4%2BPwvqnAvTnykCTQ%2B9Vde61lJZuuxA6WulIwr";
-        private const int Answer = 0;
+        private const string Answer = "0";
 
         [TestMethod]
         public void EqualsOnEqualSolutionReturnsTrue()

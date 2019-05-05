@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{35AE7C83-F762-4ACE-8F68-681095A06B6F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities", "CloudFlareUtilities\CloudFlareUtilities.csproj", "{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities.ClearanceExample", "CloudFlareUtilities.ClearanceExample\CloudFlareUtilities.ClearanceExample.csproj", "{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudFlareUtilities.Tests", "CloudFlareUtilities.Tests\CloudFlareUtilities.Tests.csproj", "{0F413149-149B-4F2D-BF43-112B761E7C66}"
 EndProject
@@ -26,10 +24,6 @@ Global
 		{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BF93B57-C09D-4B7A-A128-E79B7A8B6623}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F413149-149B-4F2D-BF43-112B761E7C66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F413149-149B-4F2D-BF43-112B761E7C66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F413149-149B-4F2D-BF43-112B761E7C66}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,9 +31,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{C5E7BEFC-78DF-47A4-A0EA-CD728DEA772E} = {35AE7C83-F762-4ACE-8F68-681095A06B6F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F50DFBED-B229-4E39-93DE-82CC94A4A5AE}

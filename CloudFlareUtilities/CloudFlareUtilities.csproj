@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.1</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>A .NET Standard Library to bypass Cloudflare's Anti-DDoS measure (JavaScript challenge) using a DelegatingHandler.</Description>
     <Company>El Cattivo</Company>
@@ -18,5 +18,9 @@
     <Authors>https://github.com/elcattivo/CloudFlareUtilities/graphs/contributors</Authors>
     <FileVersion>1.3.0.0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jint" Version="2.11.58" />
+  </ItemGroup>
 
 </Project>

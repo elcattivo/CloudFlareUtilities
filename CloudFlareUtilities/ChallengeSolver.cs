@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jint;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -37,20 +38,53 @@ namespace CloudFlareUtilities
             return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer, s);
         }
 
-        private static double DecodeSecretNumber(string challengePageContent, string targetHost)
+        private static string DecodeSecretNumber(string challengePageContent, string targetHost)
         {
             var script = Regex.Matches(challengePageContent, ScriptPattern, RegexOptions.Singleline)
                 .Cast<Match>().Select(m => m.Groups["Content"].Value)
                 .First(c => c.Contains("jschl-answer"));
 
+            //var doc = new AngleSharp.Parser.Html.HtmlParser().Parse(challengePageContent);
+            var contentMatch = Regex.Match(challengePageContent, @"<div.*?id=""(?<id>cf-dn.*?)""[^>]*>(?<content>.*?)</div>");
+            string kContent = contentMatch.Groups["content"].Value;
+            var reg = Regex.Match(script, @"(\w+?)\s?=\s?\{\s?""(\w+?)"":(.*?)\}");
+            var varA = reg.Groups[1].Value;
+            var varB = reg.Groups[2].Value;
+
+            var initValue = reg.Groups[3].Value;
+            var st = challengePageContent.Replace(";" + varA + "." + varB, "\r\n" + varA + "." + varB).Replace(";a.value", "\r\na.value");
+            var steps = st.Split('\r', '\n').Where(x => x.StartsWith(varA + "." + varB)).Select(x => x.Replace(varA + "." + varB, "a"));
+
+            var engine = new Engine();
+            engine.SetValue("t", targetHost);
+            engine.SetValue("k", "test");
+            engine.Execute("var a=" + initValue + ";");
+            engine.Execute("var g = String.fromCharCode;");
+            engine.Execute("var  o = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\";");
+            engine.Execute("var document = {}; document.getElementById = function(elem){ return {innerHTML :'" + kContent + "'};};");
+            engine.Execute("var e = function(s) {          s += \"==\".slice(2 - (s.length & 3));     var bm, r = \"\", r1, r2, i = 0;       for (; i < s.length;) { bm = o.indexOf(s.charAt(i++)) << 18 | o.indexOf(s.charAt(i++)) << 12 | (r1 = o.indexOf(s.charAt(i++))) << 6 | (r2 = o.indexOf(s.charAt(i++)));              r += r1 === 64 ? g(bm >> 16 & 255): r2 === 64 ? g(bm >> 16 & 255, bm >> 8 & 255): g(bm >> 16 & 255, bm >> 8 & 255, bm & 255); } return r;};");
+
+            foreach (var step in steps)
+            {
+                var modStep = step.Replace("(true+\"\")[0]+\".\"+([][\"fill\"]+\"\")[3]+(+(101))[\"to\"+String[\"name\"]](21)[1]+(false+\"\")[1]+(true+\"\")[1]+Function(\"return escape\")()((\"\")[\"italics\"]())[2]+(true+[][\"fill\"])[10]+(undefined+\"\")[2]+(true+\"\")[3]+(+[]+Array)[10]+(true+\"\")[0]", "\"t.charCodeAt\"");
+                modStep = modStep.Replace("function(p){var p = eval(eval(atob(\"ZG9jdW1l\")+(undefined+\"\")[1]+(true+\"\")[0]+(+(+!+[]+[+!+[]]+(!![]+[])[!+[]+!+[]+!+[]]+[!+[]+!+[]]+[+[]])+[])[+!+[]]+(false+[0]+String)[20]+(true+\"\")[3]+(true+\"\")[0]+\"Element\"+(+[]+Boolean)[10]+(NaN+[Infinity])[10]+\"Id(\"+(+(20))[\"to\"+String[\"name\"]](21)+\").\"+atob(\"aW5uZXJIVE1M\"))); return +(p)}()", kContent);
+                modStep = modStep.Replace("(true+\"\")[0]+\".ch\"+(false+\"\")[1]+(true+\"\")[1]+Function(\"return escape\")()((\"\")[\"italics\"]())[2]+\"o\"+(undefined+\"\")[2]+(true+\"\")[3]+\"A\"+(true+\"\")[0]", "\"t.charCodeAt\"");
+                engine.Execute(modStep);
+            }
+            var tmpValue = engine.Execute("a.toFixed(10)").GetCompletionValue().AsString();
+            return tmpValue;
+        }
+
+        internal static string DecodeSecretNumberScript(string script)
+        {
             var statements = script.Split(';');
             var stepGroups = statements.Select(GetSteps).Where(g => g.Any()).ToList();
             var steps = stepGroups.Select(ResolveStepGroup).ToList();
             var seed = steps.First().Item2;
 
-            var secretNumber = Math.Round(steps.Skip(1).Aggregate(seed, ApplyDecodingStep), 10) + targetHost.Length;
+            var secretNumber = steps.Skip(1).Aggregate(seed, ApplyDecodingStep);
 
-            return script.Contains(IntegerSolutionTag) ? (int)secretNumber : secretNumber;
+            return secretNumber.ToString("#.0000000000");
         }
 
         private static Tuple<string, double> ResolveStepGroup(IEnumerable<Tuple<string, double>> group)
