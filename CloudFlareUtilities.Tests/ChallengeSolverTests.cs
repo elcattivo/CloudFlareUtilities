@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,148 +8,28 @@ namespace CloudFlareUtilities.Tests
     [TestClass]
     public class ChallengeSolverTests
     {
-        private const string Host = "domain.tld";
-        private const string VerificationCode = "1bb00fcf0ffa7618008d5d585d655e29";
-        private const string Pass = "1458515751.766-rbEAC9yDbP";
-        private const string S = "a33e1579d603680391f081b33f86e478ba3375bb-1550232454-1800-Ae6ohrZmyMZv%2BClUP8pj5kzeYebjJcr%2BmAKyA8WvsjXgV2v3L7FTTCpgSPxCqXZyM9VivmO4%2BPwvqnAvTnykCTQ%2B9Vde61lJZuuxA6WulIwr";
-        private const string ClearancePage = "/cdn-cgi/l/chk_jschl";
-        private const int ValidIntegerAnswer = 293;
-        private const double ValidFloatAnswer = 47.1687814926;
-
-        private const string IntegerChallengeScript =
-@"<script type=""text/javascript"">
-  //<![CDATA[
-  (function(){
-    var a = function() {try{return !!window.addEventListener} catch(e) {return !1} },
-    b = function(b, c) {a() ? document.addEventListener(""DOMContentLoaded"", b, c) : document.attachEvent(""onreadystatechange"", b)};
-    b(function(){
-      var a = document.getElementById('cf-content');a.style.display = 'block';
-      setTimeout(function(){
-        var t,r,a,f, BAaNzsI={""BthP"":+((!+[]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]))};
-        t = document.createElement('div');
-        t.innerHTML=""<a href='/'>x</a>"";
-        t = t.firstChild.href;r = t.match(/https?:\\/\\//)[0];
-        t = t.substr(r.length); t = t.substr(0,t.length-1);
-        a = document.getElementById('jschl-answer');
-        f = document.getElementById('challenge-form');
-        ;BAaNzsI.BthP-=+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]));BAaNzsI.BthP+=!+[]+!![];BAaNzsI.BthP*=+((!+[]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));BAaNzsI.BthP/=!+[]+!![];a.value = parseInt(BAaNzsI.BthP, 10) + t.length;
-        f.submit();
-      }, 4000);
-    }, false);
-  })();
-  //]]>
-</script>";
-
-        private const string FloatChallengeScript =
-@"<script type=""text/javascript"">
-  //<![CDATA[
-  (function(){
-    var a = function() {try{return !!window.addEventListener} catch(e) {return !1} },
-    b = function(b, c) {a() ? document.addEventListener(""DOMContentLoaded"", b, c) : document.attachEvent(""onreadystatechange"", b)};
-    b(function(){
-      var a = document.getElementById('cf-content');a.style.display = 'block';
-      setTimeout(function(){
-        var s,t,o,p,b,r,e,a,k,i,n,g,f, bnuYckT={""VcNScacY"":+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(+!![])+(+[])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[]))};
-        t = document.createElement('div');
-        t.innerHTML=""<a href='/'>x</a>"";
-        t = t.firstChild.href;r = t.match(/https?:\/\//)[0];
-        t = t.substr(r.length); t = t.substr(0,t.length-1);
-        a = document.getElementById('jschl-answer');
-        f = document.getElementById('challenge-form');
-        ;bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]))/+((!+[]+!![]+[])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(+[])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY+=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(+[]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY*=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]));bnuYckT.VcNScacY-=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+!![]+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]));bnuYckT.VcNScacY-=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]))/+((+!![]+[])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]));bnuYckT.VcNScacY+=+((!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+[])+(!+[]+!![])+(+[])+(!+[]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![])+(!+[]+!![]+!![]))/+((!+[]+!![]+[])+(!+[]+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![])+(+!![])+(!+[]+!![]+!![])+(!+[]+!![]+!![]+!![]+!![]));a.value = +bnuYckT.VcNScacY.toFixed(10) + t.length; '; 121'
-        f.action += location.hash;
-        f.submit();
-      }, 4000);
-    }, false);
-  })();
-  //]]>
-</script>";
-
-        private static readonly string Form =
-$@"<form id=""challenge-form"" action=""{ClearancePage}"" method=""get"">
-    <input type=""hidden"" name=""jschl_vc"" value=""{VerificationCode}""/>
-    <input type=""hidden"" name=""pass"" value=""{Pass}""/>
-<input type=""hidden"" name=""s"" value=""{S}""/>
-    <input type=""hidden"" id=""jschl-answer"" name=""jschl_answer""/>
-</form>";
-
         [TestMethod]
-        public void SolveReturnsValidIntegerAnswer()
+        public void SolverTest1()
         {
-            var pageContent = IntegerChallengeScript + Form;
+            var pageContent = CloudFlareUtilities.Tests.Properties.Resources.uam_zaczero_pl_test;
 
-            var solution = ChallengeSolver.Solve(pageContent, Host);
+            var solution = ChallengeSolver.Solve(pageContent, new Uri("https://uam.zaczero.pl"));
 
-            Assert.AreEqual(ValidIntegerAnswer, solution.Answer);
+            Assert.AreEqual("220.9846706212", solution.Jschl_answer);
+
+            Assert.AreEqual("https://uam.zaczero.pl/cdn-cgi/l/chk_jschl?s=095491918ae160c2208b1bf4c157002b3d658ec6-1557322101-1800-AXZarxvZjnf7ImhZPUOvM9QP%2Bib5mXw2iAEijanw3i%2Fksrya7tmkvQC172UoaZC1Srk3zPVGMMcGEQtohsdCoGAS%2BoJ6JA%2BAQzJ13%2FSpqSMeRhtj2S%2BHh7EIDmjB42ePIQ%3D%3D&jschl_vc=9526100f905d05a1065d6faf43e49233&pass=1557322105.022-snbhv%2BtzRX&jschl_answer=220.9846706212", solution.ClearanceQuery);
         }
 
         [TestMethod]
-        public void SolveReturnsValidFloatAnswer()
+        public void SolverTest2()
         {
-            var pageContent = FloatChallengeScript + Form;
+            var pageContent = CloudFlareUtilities.Tests.Properties.Resources.uam_hitmehard_fun_test;
 
-            var solution = ChallengeSolver.Solve(pageContent, Host);
+            var solution = ChallengeSolver.Solve(pageContent, new Uri("https://uam.hitmehard.fun"));
 
-            Assert.AreEqual(ValidFloatAnswer, solution.Answer);
-        }
+            Assert.AreEqual("238.3159095016", solution.Jschl_answer);
 
-        [TestMethod]
-        public void SolveReturnsVerificationCode()
-        {
-            var pageContent = IntegerChallengeScript + Form;
-
-            var solution = ChallengeSolver.Solve(pageContent, Host);
-
-            Assert.AreEqual(VerificationCode, solution.VerificationCode);
-        }
-
-        [TestMethod]
-        public void SolveReturnsPass()
-        {
-            var pageContent = IntegerChallengeScript + Form;
-
-            var solution = ChallengeSolver.Solve(pageContent, Host);
-
-            Assert.AreEqual(Pass, solution.Pass);
-        }
-
-        [TestMethod]
-        public void SolveReturnsClearancePage()
-        {
-            var pageContent = IntegerChallengeScript + Form;
-
-            var solution = ChallengeSolver.Solve(pageContent, Host);
-
-            Assert.AreEqual(ClearancePage, solution.ClearancePage);
-        }
-
-        [TestMethod]
-        public void SolveReturnsValidClearanceQuery()
-        {
-            var pageContent = IntegerChallengeScript + Form;
-
-            var solution = ChallengeSolver.Solve(pageContent, Host);
-
-            Assert.AreEqual(
-                $"{ClearancePage}?s={Uri.EscapeDataString(S)}&jschl_vc={VerificationCode}&pass={Pass}&jschl_answer={ValidIntegerAnswer}",
-                solution.ClearanceQuery);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void ApplyDecodingStepOnUnknownOperatorThrowsArgumentOutOfRangeException()
-        {
-            const string invalidOperator = "%";
-            try
-            {
-                var solverType = new PrivateType(typeof(ChallengeSolver));
-                solverType.InvokeStatic("ApplyDecodingStep", 323D, Tuple.Create(invalidOperator, 32D));
-            }
-            //We're calling this with reflection, so we have to throw up the TargetInvocationException to represent what would actually occur.
-            catch (TargetInvocationException e)
-            {
-                throw e.InnerException;
-            }
+            Assert.AreEqual("https://uam.hitmehard.fun/cdn-cgi/l/chk_jschl?s=6a751526e16e65dbc665ab6ad7ba5f874fcc020f-1557342188-1800-AR%2BwwKhIPPW8Yq%2BTSDlnfKOjmNPCE1PtIK2nRYhuQoVcB%2B4acyAqTM6ziIW3ouNim8%2F5ltAmjquyJa8AqzI0gEkn6GALEI6mIubz99wrDyT3gWbfBf8mOJjnl8jpYDPZKg%3D%3D&jschl_vc=b11fd83e7036ce9958f69cb30c166784&pass=1557342192.927-GTjaWEbR8%2F&jschl_answer=238.3159095016", solution.ClearanceQuery);
         }
     }
 }

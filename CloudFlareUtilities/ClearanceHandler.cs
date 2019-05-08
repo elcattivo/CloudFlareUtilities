@@ -29,6 +29,8 @@ namespace CloudFlareUtilities
         private static readonly IEnumerable<string> CloudFlareServerNames = new[] { "cloudflare", "cloudflare-nginx" };
         private const string IdCookieName = "__cfduid";
         private const string ClearanceCookieName = "cf_clearance";
+        private string StandardUserAgentIfMissing = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
+        private string StandardAcceptHeaderIfMissing = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"; //https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation/List_of_default_Accept_values
 
         private readonly CookieContainer _cookies = new CookieContainer();
         private readonly HttpClient _client;
@@ -87,7 +89,14 @@ namespace CloudFlareUtilities
             var idCookieBefore = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, IdCookieName).FirstOrDefault();
             var clearanceCookieBefore = ClientHandler.CookieContainer.GetCookiesByName(request.RequestUri, ClearanceCookieName).FirstOrDefault();
 
-            EnsureClientHeader(request);
+            if (request.Headers.UserAgent.Any())
+                StandardUserAgentIfMissing = request.Headers.UserAgent.ToString();
+
+            if (request.Headers.Accept.Any())
+                StandardAcceptHeaderIfMissing = request.Headers.Accept.ToString();
+
+            EnsureClientHeader(request.Headers, request.RequestUri);
+
             InjectCookies(request);
 
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -125,12 +134,6 @@ namespace CloudFlareUtilities
             return response;
         }
 
-        private static void EnsureClientHeader(HttpRequestMessage request)
-        {
-            if (!request.Headers.UserAgent.Any())
-                request.Headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
-        }
-
         private static bool IsClearanceRequired(HttpResponseMessage response)
         {
             var isServiceUnavailable = response.StatusCode == HttpStatusCode.ServiceUnavailable;
@@ -161,30 +164,57 @@ namespace CloudFlareUtilities
             }
         }
 
+        private void EnsureClientHeader(HttpRequestHeaders headers, System.Uri targetUri)
+        {
+            //The following headers are only required  for the /cdn-cgi/l/chk_jschl request | Date 05/08/19
+            if (targetUri.Query.Contains("chk_jschl"))
+            {
+                if (headers.Host == null)
+                    headers.Host = targetUri.Host;
+
+                if (headers.Referrer == null)
+                    headers.Referrer = targetUri;
+
+                if (headers.Connection.Count == 0)
+                    headers.Connection.ParseAdd("keep-alive");
+            }
+
+            //The following headers are required both for the initial request and the /cdn-cgi/l/chk_jschl request | Date 05/08/19
+            if (headers.Accept.Count == 0)
+                headers.Accept.ParseAdd(StandardAcceptHeaderIfMissing);
+
+            if (headers.AcceptLanguage.Count == 0)
+                headers.AcceptLanguage.ParseAdd("en,en-US;q=0.9");
+
+            if (!headers.UserAgent.Any())
+            {
+                headers.UserAgent.ParseAdd(StandardUserAgentIfMissing);
+            }
+
+            if (!headers.Contains("DNT"))
+                headers.Add("DNT", "1");
+
+            if (!headers.Contains("Upgrade-Insecure-Requests"))
+                headers.Add("Upgrade-Insecure-Requests", "1");
+        }
+
         private async Task PassClearance(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             SaveIdCookie(response);
 
             var pageContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var scheme = response.RequestMessage.RequestUri.Scheme;
-            var host = response.RequestMessage.RequestUri.Host;
-            var port = response.RequestMessage.RequestUri.Port;
-            var solution = ChallengeSolver.Solve(pageContent, host);
+            var solution = ChallengeSolver.Solve(pageContent, response.RequestMessage.RequestUri);
 
-            var clearanceUri = $"{scheme}://{host}:{port}{solution.ClearanceQuery}";
+            var clearanceUri = solution.ClearanceQuery;
 
             await Task.Delay(ClearanceDelay, cancellationToken).ConfigureAwait(false);
 
             var clearanceRequest = new HttpRequestMessage(HttpMethod.Get, clearanceUri);
 
-            if (response.RequestMessage.Headers.TryGetValues(HttpHeader.UserAgent, out var userAgent))
-                clearanceRequest.Headers.Add(HttpHeader.UserAgent, userAgent);
+            EnsureClientHeader(clearanceRequest.Headers, response.RequestMessage.RequestUri);
 
-            if (response.RequestMessage.RequestUri != null)
-                clearanceRequest.Headers.Add("Referer", response.RequestMessage.RequestUri.ToString());
-
-            clearanceRequest.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-            clearanceRequest.Headers.Add("Upgrade-Insecure-Requests", "1");
+            if (clearanceRequest.Headers.Host == null)
+                clearanceRequest.Headers.Host = response.RequestMessage.RequestUri.Host;
 
             var passResponse = await _client.SendAsync(clearanceRequest, cancellationToken).ConfigureAwait(false);
             SaveIdCookie(passResponse); // new ID might be set as a response to the challenge in some cases

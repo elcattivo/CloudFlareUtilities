@@ -15,9 +15,8 @@ __Contributors__
 - [Eric898989](https://github.com/Eric898989)
 
 ## Features
-- No dependencies (e.g. no external JavaScript interpreter required)
 - Easily integrated into your project (implemented as DelegatingHandler; e.g. can be used with [HttpClient](https://msdn.microsoft.com/en-us/library/system.net.http.httpclient(v=vs.118).aspx))
-- Usable on many different platforms ([NET Standard 1.1](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard1.1.md))
+- Usable on many different platforms ([NET Standard 2.0](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md))
 
 ## Usage
 ```csharp

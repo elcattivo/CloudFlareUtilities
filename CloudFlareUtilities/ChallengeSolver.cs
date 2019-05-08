@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CloudFlareUtilities
@@ -10,98 +11,68 @@ namespace CloudFlareUtilities
     /// </summary>
     public static class ChallengeSolver
     {
-        private const string IntegerSolutionTag = "parseInt(";
-
-        private const string ScriptPattern = @"<script\b[^>]*>(?<Content>.*?)<\/script>";
-        private const string ZeroPattern = @"\[\]";
-        private const string OnePattern = @"\!\+\[\]|\!\!\[\]";
-        private const string DigitPattern = @"\(?(\+?(" + OnePattern + @"|" + ZeroPattern + @"))+\)?";
-        private const string NumberPattern = @"\+?\(?(?<Digits>\+?" + DigitPattern + @")+\)?";
-        private const string OperatorPattern = @"(?<Operator>[\+|\-|\*|\/])\=?";
-        private const string StepPattern = @"(" + OperatorPattern + @")??(?<Number>" + NumberPattern + ")";
-
         /// <summary>
         /// Solves the given JavaScript challenge.
         /// </summary>
         /// <param name="challengePageContent">The HTML content of the clearance page, which contains the challenge.</param>
-        /// <param name="targetHost">The hostname of the protected website.</param>
+        /// <param name="targetUri">The Uri of the protected website.</param>
         /// <returns>The solution.</returns>
-        public static ChallengeSolution Solve(string challengePageContent, string targetHost)
+        public static ChallengeSolution Solve(string challengePageContent, Uri targetUri)
         {
-            var jschlAnswer = DecodeSecretNumber(challengePageContent, targetHost);
-            var jschlVc = Regex.Match(challengePageContent, "name=\"jschl_vc\" value=\"(?<jschl_vc>[^\"]+)").Groups["jschl_vc"].Value;
-            var pass = Regex.Match(challengePageContent, "name=\"pass\" value=\"(?<pass>[^\"]+)").Groups["pass"].Value;
-            var s = Regex.Match(challengePageContent, "name=\"s\" value=\"(?<s>[^\"]+)").Groups["s"].Value;
-            var clearancePage = Regex.Match(challengePageContent, "id=\"challenge-form\" action=\"(?<action>[^\"]+)").Groups["action"].Value;
+            var formMatch = CloudflareRegex.JsFormRegex.Match(challengePageContent);
+            var htmlHidden = CloudflareRegex.JsHtmlHiddenRegex.Match(challengePageContent);
+            var scriptMatch = CloudflareRegex.ScriptRegex.Match(challengePageContent);
+            var script = scriptMatch.Groups["script"].Value;
+            var defineMatch = CloudflareRegex.JsDefineRegex.Match(script);
+            var calcMatches = CloudflareRegex.JsCalcRegex.Matches(script);
+            var resultMatch = CloudflareRegex.JsResultRegex.Match(script);
+            var solveJsScript = PrepareJsScript(targetUri.Host, defineMatch, calcMatches, htmlHidden, resultMatch.Groups["addHostLength"].Success);
 
-            return new ChallengeSolution(clearancePage, jschlVc, pass, jschlAnswer, s);
+            var jschlAnswer = new Jint.Engine().Execute(solveJsScript).GetCompletionValue().AsString();
+            var clearancepage = $"{targetUri.Scheme}://{targetUri.Host}{formMatch.Groups["action"]}";
+            var s = formMatch.Groups["s"].Value;
+            var jschl_vc = formMatch.Groups["jschl_vc"].Value;
+            var pass = formMatch.Groups["pass"].Value;
+
+            return new ChallengeSolution(clearancepage, jschl_vc, pass, jschlAnswer, s);
         }
 
-        private static double DecodeSecretNumber(string challengePageContent, string targetHost)
+        private static string PrepareJsScript(string targetHost, Match defineMatch, MatchCollection calcMatches, Match htmlHiddenMatch, bool addHostLengthToResult)
         {
-            var script = Regex.Matches(challengePageContent, ScriptPattern, RegexOptions.Singleline)
-                .Cast<Match>().Select(m => m.Groups["Content"].Value)
-                .First(c => c.Contains("jschl-answer"));
+            var solveScriptStringBuilder = new StringBuilder(defineMatch.Value);
 
-            var statements = script.Split(';');
-            var stepGroups = statements.Select(GetSteps).Where(g => g.Any()).ToList();
-            var steps = stepGroups.Select(ResolveStepGroup).ToList();
-            var seed = steps.First().Item2;
-
-            var secretNumber = Math.Round(steps.Skip(1).Aggregate(seed, ApplyDecodingStep), 10) + targetHost.Length;
-
-            return script.Contains(IntegerSolutionTag) ? (int)secretNumber : secretNumber;
-        }
-
-        private static Tuple<string, double> ResolveStepGroup(IEnumerable<Tuple<string, double>> group)
-        {
-            var steps = group.ToList();
-            var op = steps.First().Item1;
-            var seed = steps.First().Item2;
-
-            var operand = steps.Skip(1).Aggregate(seed, ApplyDecodingStep);
-
-            return Tuple.Create(op, operand);
-        }
-
-        private static IEnumerable<Tuple<string, double>> GetSteps(string text)
-        {
-            var steps = Regex.Matches(text, StepPattern).Cast<Match>()
-                .Select(s => Tuple.Create(s.Groups["Operator"].Value, DeobfuscateNumber(s.Groups["Number"].Value)))
-                .ToList();
-
-            return steps;
-        }
-
-        private static double DeobfuscateNumber(string obfuscatedNumber)
-        {
-            var digits = Regex.Match(obfuscatedNumber, NumberPattern)
-                .Groups["Digits"].Captures.Cast<Capture>()
-                .Select(c => Regex.Matches(c.Value, OnePattern).Count);
-
-            var number = double.Parse(string.Join(string.Empty, digits));
-
-            return number;
-        }
-
-        private static double ApplyDecodingStep(double number, Tuple<string, double> step)
-        {
-            var op = step.Item1;
-            var operand = step.Item2;
-
-            switch (op)
+            foreach (Match calcMatch in calcMatches)
             {
-                case "+":
-                    return number + operand;
-                case "-":
-                    return number - operand;
-                case "*":
-                    return number * operand;
-                case "/":
-                    return number / operand;
-                default:
-                    throw new ArgumentOutOfRangeException($"Unknown operator: {op}");
+                if (calcMatch.Value.EndsWith("}();") && calcMatch.Value.Contains("eval(eval("))
+                {
+                    var i = calcMatch.Value.IndexOf("function", StringComparison.Ordinal);
+                    solveScriptStringBuilder.Append(calcMatch.Value.Substring(0, i) + htmlHiddenMatch.Groups["inner"].Value + ";");
+                }
+                else if (calcMatch.Value.EndsWith(")))));") && calcMatch.Value.Contains("return eval("))
+                {
+                    var match = CloudflareRegex.JsPParamRegex.Match(calcMatch.Value);
+                    if (match.Success)
+                    {
+                        var p = match.Groups["p"].Value;
+                        var i = calcMatch.Value.IndexOf("(function", StringComparison.Ordinal);
+                        solveScriptStringBuilder.Append(calcMatch.Value.Substring(0, i) + $"'{targetHost}'.charCodeAt({p})" + ");");
+                    }
+                }
+                else
+                {
+                    solveScriptStringBuilder.Append(calcMatch.Value);
+                }
             }
+
+            if (addHostLengthToResult)
+            {
+                solveScriptStringBuilder.Append($"{defineMatch.Groups["className"].Value}.{defineMatch.Groups["propName"].Value} += {targetHost.Length};");
+            }
+
+            solveScriptStringBuilder.Append($"{defineMatch.Groups["className"].Value}.{defineMatch.Groups["propName"].Value}.toFixed(10)");
+
+            return solveScriptStringBuilder.ToString();
         }
+
     }
 }
