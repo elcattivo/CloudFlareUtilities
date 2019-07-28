@@ -42,7 +42,7 @@ public class CloudFlareSampleClass
     {
         try
         {
-            // Any JS challenge will be solved automatically for you.
+			// Any JS challenge will be solved automatically for you.
 			var content = await CloudFlareHttpClient.GetStringAsync("http://protected-site.tld/");
         }
         catch (AggregateException ex) when (ex.InnerException is CloudFlareClearanceException)
