@@ -21,27 +21,39 @@ __Contributors__
 
 ## Usage
 ```csharp
-try
+public class CloudFlareSampleClass
 {
-    // Create the clearance handler.
-    var handler = new ClearanceHandler
+	// Use a static HttpClient to prevent issues described in this article
+	// https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+	private static HttpClient CloudFlareHttpClient;
+
+	static CloudFlareSampleClass 
+	{
+		// Create the clearance handler.
+		var handler = new ClearanceHandler
+		{
+			MaxRetries = 2 // Optionally specify the number of retries, if clearance fails (default is 3).
+		};
+
+		CloudFlareHttpClient = new HttpClient(handler);
+	}
+
+    public void GetProtectedSiteContent()
     {
-        MaxRetries = 2 // Optionally specify the number of retries, if clearance fails (default is 3).
-    };
-
-    // Create a HttpClient that uses the handler to bypass CloudFlare's JavaScript challange.
-    var client = new HttpClient(handler);
-
-    // Use the HttpClient as usual. Any JS challenge will be solved automatically for you.
-    var content = await client.GetStringAsync("http://protected-site.tld/");
-}
-catch (AggregateException ex) when (ex.InnerException is CloudFlareClearanceException)
-{
-    // After all retries, clearance still failed.
-}
-catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
-{
-    // Looks like we ran into a timeout. Too many clearance attempts?
-    // Maybe you should increase client.Timeout as each attempt will take about five seconds.
+        try
+        {
+            // Any JS challenge will be solved automatically for you.
+			var content = await CloudFlareHttpClient.GetStringAsync("http://protected-site.tld/");
+        }
+        catch (AggregateException ex) when (ex.InnerException is CloudFlareClearanceException)
+		{
+			// After all retries, clearance still failed.
+		}
+		catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+		{
+			// Looks like we ran into a timeout. Too many clearance attempts?
+			// Maybe you should increase client.Timeout as each attempt will take about five seconds.
+		}
+    }
 }
 ```
