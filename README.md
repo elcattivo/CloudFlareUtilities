@@ -32,7 +32,8 @@ public class CloudFlareSampleClass
 		// Create the clearance handler.
 		var handler = new ClearanceHandler
 		{
-			MaxRetries = 2 // Optionally specify the number of retries, if clearance fails (default is 3).
+			// Optionally specify the number of retries, if clearance fails (default is 3).
+			MaxRetries = 2 
 		};
 
 		CloudFlareHttpClient = new HttpClient(handler);
