@@ -23,37 +23,37 @@ __Contributors__
 ```csharp
 public class CloudFlareSampleClass
 {
-// Use a static HttpClient to prevent issues described in this article
-// https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
-private static HttpClient CloudFlareHttpClient;
+	// Use a static HttpClient to prevent issues described in this article
+	// https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+	private static HttpClient CloudFlareHttpClient;
 
-static CloudFlareSampleClass 
-{
-// Create the clearance handler.
-var handler = new ClearanceHandler
-{
-MaxRetries = 2 // Optionally specify the number of retries, if clearance fails (default is 3).
-};
+	static CloudFlareSampleClass 
+	{
+		// Create the clearance handler.
+		var handler = new ClearanceHandler
+		{
+			MaxRetries = 2 // Optionally specify the number of retries, if clearance fails (default is 3).
+		};
 
-CloudFlareHttpClient = new HttpClient(handler);
-}
+		CloudFlareHttpClient = new HttpClient(handler);
+	}
 
-public void GetProtectedSiteContent()
-{
-try
-{
-// Any JS challenge will be solved automatically for you.
-var content = await CloudFlareHttpClient.GetStringAsync("http://protected-site.tld/");
-}
-catch (AggregateException ex) when (ex.InnerException is CloudFlareClearanceException)
-{
-// After all retries, clearance still failed.
-}
-catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
-{
-// Looks like we ran into a timeout. Too many clearance attempts?
-// Maybe you should increase client.Timeout as each attempt will take about five seconds.
-}
-}
+	public void GetProtectedSiteContent()
+	{
+		try
+		{
+			// Any JS challenge will be solved automatically for you.
+			var content = await CloudFlareHttpClient.GetStringAsync("http://protected-site.tld/");
+		}
+		catch (AggregateException ex) when (ex.InnerException is CloudFlareClearanceException)
+		{
+			// After all retries, clearance still failed.
+		}
+		catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+		{
+			// Looks like we ran into a timeout. Too many clearance attempts?
+			// Maybe you should increase client.Timeout as each attempt will take about five seconds.
+		}
+	}
 }
 ```
